@@ -34,6 +34,10 @@ def _emoji_on() -> bool:
     return _flag("WOIDEN_LOG_EMOJI", True)
 
 
+def _logs_on() -> bool:
+    return _flag("GRID_LOG", False)
+
+
 # level -> emoji (optional)
 _LEVEL_EMOJI = {
     "INFO": "ℹ️ ",
@@ -84,6 +88,8 @@ def _e(key: str) -> str:
 
 def log(msg: str, level: str = "INFO", tag: str = "") -> None:
     """Standard line. tag e.g. yolo / audio / api (optional)."""
+    if not _logs_on():
+        return
     level = (level or "INFO").upper()
     prefix = f"[{level}]"
     if tag:
@@ -111,6 +117,8 @@ def log_once(key: str, msg: str, level: str = "INFO", every: float = 2.0, tag: s
 
 def step_begin(idx: int, total: int, name: str, detail: str = "") -> None:
     """Big step banner — main pipeline readability."""
+    if not _logs_on():
+        return
     name_u = (name or "STEP").upper()
     em = _STEP_EMOJI.get(name_u, "▶️") if _emoji_on() else ">"
     bar = "─" * 12
@@ -119,6 +127,8 @@ def step_begin(idx: int, total: int, name: str, detail: str = "") -> None:
 
 
 def step_end(name: str, ok: bool, detail: str = "", seconds: Optional[float] = None) -> None:
+    if not _logs_on():
+        return
     name_u = (name or "STEP").upper()
     if _emoji_on():
         mark = "✅" if ok else "❌"
@@ -145,6 +155,8 @@ def run_start(title: str = "reCAPTCHA YOLO") -> None:
     global _run_t0, _run_notes
     _run_t0 = time.time()
     _run_notes = []
+    if not _logs_on():
+        return
     em = _STEP_EMOJI.get("START", "") if _emoji_on() else ""
     line = f"{'=' * 8} {em} {title} START {'=' * 8}".strip()
     print(line, flush=True)
@@ -158,6 +170,9 @@ def run_note(note: str) -> None:
 def run_end(ok: bool, reason: str = "") -> None:
     global _run_t0
     elapsed = (time.time() - _run_t0) if _run_t0 else 0.0
+    if not _logs_on():
+        _run_t0 = None
+        return
     em = _STEP_EMOJI.get("RESULT", "") if _emoji_on() else ""
     status = "SUCCESS" if ok else "FAIL"
     mark = "✅" if (ok and _emoji_on()) else ("❌" if _emoji_on() else status)
