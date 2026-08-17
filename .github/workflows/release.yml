@@ -14,7 +14,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            artifact_name: grid-vision-linux-amd64
+          - os: ubuntu-24.04-arm
+            artifact_name: grid-vision-linux-arm64
 
     steps:
       - name: Checkout Code
@@ -32,25 +36,17 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
 
-      - name: Build with PyInstaller (Linux)
-        if: runner.os == 'Linux'
+      - name: Build with PyInstaller
         run: |
           chmod +x build.sh
           ./build.sh
-          mv dist/recaptcha-yolo dist/recaptcha-yolo-linux-amd64
-
-      - name: Build with PyInstaller (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          python -m PyInstaller --noconfirm --clean --onefile --name recaptcha-yolo-windows-amd64 --collect-all DrissionPage --collect-all PIL recaptcha_yolo.py
+          mv dist/grid-vision dist/${{ matrix.artifact_name }}
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: binaries-${{ runner.os }}
-          path: |
-            dist/recaptcha-yolo-linux-amd64
-            dist/recaptcha-yolo-windows-amd64.exe
+          name: binaries-${{ matrix.os }}
+          path: dist/${{ matrix.artifact_name }}
 
   release:
     name: Create Release
@@ -73,6 +69,4 @@ jobs:
           name: Release ${{ github.event.inputs.tag }}
           draft: false
           prerelease: false
-          files: |
-            dist/recaptcha-yolo-linux-amd64
-            dist/recaptcha-yolo-windows-amd64.exe
+          files: dist/*
