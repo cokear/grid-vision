@@ -58,3 +58,9 @@ PyInstaller output is platform-specific.
 python3 -m unittest discover -s tests -v
 python3 -m py_compile *.py tests/*.py
 ```
+
+## Disclaimer
+
+**For Educational and Research Purposes Only.**
+
+This project (`grid-vision`) is provided "as is", without warranty of any kind. The author is not responsible for any misuse, damage, or violation of Terms of Service caused by the use of this software. By using this software, you agree to take full responsibility for your actions.
